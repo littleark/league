@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>inversions</title>
+	<link rel="stylesheet" href="css/d.css">
+	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+</head>
+<body>
+	<div id="chart"></div>
+	<script src="js/Chart.js"></script>
+	<script>
+
+		d3.csv("data/IT.csv",function(d){
+
+			d.year= +d.year;
+			d.day= +d.day;
+			d.position= +d.position;
+			d.last= +d.last;
+
+
+			return d;
+		},function(data){
+			console.log(data);
+
+			var seasons=[];
+			data.filter(function(d){
+				return d.position<5;
+			}).forEach(function(d){
+				if(!seasons[d.year]) {
+					seasons[d.year]=[];
+				}
+				if(!seasons[d.year][d.day]) {
+					seasons[d.year][d.day]=[];
+				}
+				/*console.log({
+					t:d.team,
+					p:d.last
+				})*/
+				seasons[d.year][d.day].push({
+					t:d.team,
+					p:d.last
+				});
+
+			})
+
+			console.log(seasons)
+
+			var inversions={};
+			d3.entries(seasons).forEach(function(season){
+				console.log(season)
+				var year=season.key;
+				inversions[year]=[];
+				season.value.forEach(function(d,index){
+
+					
+
+				    inversions[year][index]=0;
+
+				    for(var i=0;i<d.length;i++) {
+
+				    	var i_val=d[i].p;
+
+				        for(var j=i+1;j<d.length;j++) {
+
+				        	var j_val=d[j].p;
+
+				            if(i<j && i_val>j_val) {
+				                inversions[year][index]++;
+				            }
+				        }
+				    }
+
+				    //console.log("INVERSIONS",inversions[index])
+				})
+			});
+			
+			console.log("INVERSIONS",inversions)
+
+			var avg=[];
+			d3.entries(inversions).forEach(function(year){
+				//console.log("------->",year)
+				year.value.forEach(function(day,i){
+					if(!avg[i]) {
+						avg[i]=[];
+					}
+					avg[i].push(day);
+				})
+			})
+			//console.log(avg)
+			
+			
+			new Chart(inversions,{
+				container:"#chart",
+				width:960,
+				height:500,
+				avg:avg.map(function(day){
+					return d3.mean(day);
+				}),
+				align:"left",
+				max_x:d3.max(data,function(v){
+					return v.day;
+				}),
+				max_y:d3.max(d3.entries(inversions).map(function(v){
+					return d3.max(v.value)
+				})),
+				sorting:function(a,b){
+					return d3.mean(b.value) - d3.mean(a.value);
+				},
+				interpolate:null
+			});
+
+
+			
+
+		})
+
+		
+
+	</script>
+
+</body>
+</html>

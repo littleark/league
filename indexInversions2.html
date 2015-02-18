@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>inversions</title>
+	<link rel="stylesheet" href="css/i.css">
+	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+</head>
+<body>
+	<div id="chart"></div>
+
+	<script>
+
+		d3.csv("data/IT.csv",function(d){
+
+			d.year= +d.year;
+			d.day= +d.day;
+			d.position= +d.position;
+			d.last= +d.last;
+
+
+			return d;
+		},function(data){
+			console.log(data);
+
+			var seasons=[];
+			data.forEach(function(d){
+				if(!seasons[d.year]) {
+					seasons[d.year]=[];
+				}
+				if(!seasons[d.year][d.day]) {
+					seasons[d.year][d.day]=[];
+				}
+				/*console.log({
+					t:d.team,
+					p:d.last
+				})*/
+				seasons[d.year][d.day].push({
+					t:d.team,
+					p:d.last
+				});
+
+			})
+
+			console.log(seasons)
+
+			var inversions={};
+			d3.entries(seasons).forEach(function(season){
+				console.log(season)
+				var year=season.key;
+				inversions[year]=[];
+				season.value.forEach(function(d,index){
+
+					
+
+				    inversions[year][index]=0;
+
+				    for(var i=0;i<d.length;i++) {
+
+				    	var i_val=d[i].p;
+
+				        for(var j=i+1;j<d.length;j++) {
+
+				        	var j_val=d[j].p;
+
+				            if(i<j && i_val>j_val) {
+				                inversions[year][index]++;
+				            }
+				        }
+				    }
+
+				    //console.log("INVERSIONS",inversions[index])
+				})
+			});
+			
+			console.log("INVERSIONS",inversions)
+
+			
+
+			d3.entries(inversions).forEach(function(d){
+				new Chart(d.value.filter(function(l,i){
+					return i>(d.value.length-1)/2
+				}),{
+					container:"#chart",
+					year:d.key
+				})
+			})
+
+		})
+
+		function Chart(data,options) {
+
+			var container=d3.select(options.container);
+
+			var WIDTH=options.width || 300,
+				HEIGHT=options.height || 200;
+
+			var margins={
+				top:10,
+				bottom:10,
+				left:10,
+				right:10
+			}
+
+			var xscale=d3.scale.linear().domain([0,data.length-1]).rangeRound([0,WIDTH-(margins.left+margins.right)]),
+				yscale=d3.scale.linear().domain([0,40]).rangeRound([0,HEIGHT-(margins.bottom+margins.top)])
+
+			var chart=container.append("div")
+						.attr("class","distance-chart");
+			var title=chart.append("div")
+						.attr("class","title")
+			title.append("h2")
+				.text(options.year)
+			title.append("h4")
+				.text(d3.format(",.2f")(d3.mean(data))+" "+d3.median(data))
+
+			var svg=chart.append("svg")
+							.attr("width",WIDTH)
+							.attr("height",HEIGHT);
+
+			var chart=svg.append("g")
+							.attr("transform","translate("+margins.left+","+(HEIGHT-(margins.bottom))+")");
+
+			var points=chart.selectAll("g.point")
+							.data(data)
+							.enter()
+							.append("g")
+								.attr("class","point")
+								.attr("transform",function(d,i){
+									var x=xscale(i),
+										y=yscale(d);
+									//console.log(i,d,"=",y)
+									return "translate("+x+","+(-y)+")"
+								})
+
+			/*points.append("circle")
+					.attr("cx",0)
+					.attr("cy",0)
+					.attr("r",1)*/
+
+			var line = d3.svg.line()
+			    .x(function(d,i) { return xscale(i); })
+			    .y(function(d,i) { return -yscale(d); })
+			    .interpolate("cardinal");
+
+			var color=d3.scale.quantize().domain([1993,2013]).range(["#0000ff","#00ff00","#a0091d"])
+
+			chart.append("path")
+					.style("stroke",color(options.year))
+					.attr("d",line(data))
+
+		}
+
+	</script>
+
+</body>
+</html>

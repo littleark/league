@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>inversions</title>
+	<link rel="stylesheet" href="css/d.css">
+	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+</head>
+<body>
+	<div id="chart">
+		<div id="title">
+			<h2>Road for the Champions League</h2>
+			<h4></h4>
+			<p>Questo grafico mostra il <i>grado di combattivit&agrave;</i> per la vittoria dei campionati dal 1994 ad oggi.<br/>
+			In questa esplorazione abbiamo utilizzato come grado di combattivit&agrave; la distanza media in punti tra le prime cinque squadre della classifica ad ogni giornata del campionato: pi&ugrave; le prime cinque squadre in classifica sono distanti tra loro, pi&ugrave; basso sar&agrave; il grado di combattivit&agrave; per la vittoria finale.
+			</p>
+		</div>
+	</div>
+	<script src="js/Chart.js"></script>
+	<script>
+
+		var leagues={
+			"EN":{
+				file:"EN2",
+				min_year:1994,
+				league:"Premiere League",
+				country:"England"
+			},
+			"DE":{
+				file:"DE2",
+				min_year:1992,
+				league:"Bundesliga",
+				country:"Germany"
+			},
+			"ES":{
+				file:"ES2",
+				min_year:1996,
+				league:"La Liga",
+				country:"Spain"
+			},
+			"IT":{
+				file:"IT2",
+				min_year:1996,
+				league:"Serie A",
+				country:"Italy"
+			},
+			"FR":{
+				file:"FR2",
+				min_year:1993,
+				league:"League A",
+				country:"France"
+			},
+			"SCT":{
+				file:"SCT2",
+				min_year:1994,
+				league:"League",
+				country:"Scotland"
+			},
+			"NED":{
+				file:"NED",
+				min_year:1993,
+				league:"Eredivisie",
+				country:"Netherlands"
+			}
+		}
+		var COUNTRY="EN";
+
+		d3.csv("data/"+leagues[COUNTRY]["file"]+".csv",function(d){
+
+			d.year= +d.year;
+			d.day= +d.day;
+			d.position= +d.position;
+			d.points= +d.points;
+
+			return d;
+		},function(data){
+			console.log(data);
+
+			data=data.filter(function(d){
+				return d.year>leagues[COUNTRY]["min_year"];
+			})
+
+			var nested_data = d3.nest()
+				.key(function(d) { return d.year; })
+				.key(function(d) { return d.day; })
+				.rollup(function(leaves) { 
+					return d3.sum(leaves,function(d){return 1;}); 
+				})
+				.entries(data);
+			console.log(nested_data);
+
+			var league_length={};
+			nested_data.forEach(function(year){
+				league_length[year.key]=(year.values[0].values-1)*2;
+			})
+			console.log(league_length)
+			//return;
+
+			var seasons=[];
+			data.forEach(function(d){
+				if(!seasons[d.year]) {
+					seasons[d.year]=[];
+				}
+				if(!seasons[d.year][d.day]) {
+					seasons[d.year][d.day]=[];
+				}
+				/*console.log({
+					t:d.team,
+					p:d.last
+				})*/
+				if(d.position<6) {
+					seasons[d.year][d.day].push({
+						t:d.team,
+						p:d.position,
+						points:d.points
+					});	
+				}
+				
+
+			})
+
+			seasons.forEach(function(s){
+				s.forEach(function(d){
+					d.sort(function(a,b){
+						return a.p - b.p;
+					})	
+				})
+			})
+
+			console.log(seasons)
+
+			var distances={};
+			d3.entries(seasons).forEach(function(season){
+
+				console.log(season)
+				var year=season.key;
+				distances[year]=[];
+				season.value.forEach(function(d,index){
+
+					if(!distances[year][index]) {
+						distances[year][index]=[];
+					}
+
+					var prev=null;
+
+					d.forEach(function(team){
+						if(prev) {
+							distances[year][index].push({
+								team:team.t,
+								p:team.points,
+								prev:prev.points,
+								prev_team:prev.t,
+								diff:prev.points - team.points
+							});
+						}
+						prev=team;
+					})
+
+				});
+
+			});
+
+			console.log(distances);
+
+			var diffs={}
+
+			d3.entries(distances).forEach(function(year){
+				if(!diffs[year.key]) {
+					diffs[year.key]=[];
+				}
+				console.log("!---->",year)
+				year.value.forEach(function(day) {
+					diffs[year.key].push(d3.mean(day,function(d){
+						return d.diff;
+					}));	
+				});
+			})
+			console.log(diffs);
+			
+			var avg=[];
+			d3.entries(diffs).forEach(function(year){
+				//console.log("------->",year)
+				year.value.forEach(function(day,i){
+					if(!avg[i]) {
+						avg[i]=[];
+					}
+					avg[i].push(day);
+				})
+			})
+			console.log(avg)
+			console.log(avg.map(function(day){
+						return d3.mean(day);
+					}))
+			
+
+			//d3.entries(diffs).forEach(function(d){
+
+				new Chart(diffs,{
+					container:"#chart",
+					width:960,
+					height:500,
+					league:leagues[COUNTRY],
+					league_length:league_length,
+					avg:avg.map(function(day){
+						return d3.median(day);
+					}),
+					invertedAxis:true,
+					min_x:0,
+					max_x:d3.max(data,function(v){
+						return v.day;
+					}),
+					max_y:d3.max(d3.entries(avg).map(function(v){
+						return d3.max(v.value)
+					})),
+					interpolate:"monotone",
+					distances:distances,
+					showWinner:true
+				});
+
+			//})
+
+		})
+
+		
+
+	</script>
+
+</body>
+</html>

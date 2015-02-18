@@ -1,0 +1,10 @@
+{
+  "name": "league-analyzer",
+  "description": "Analyze league data",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "mongodb": "*",
+    "request": "*"
+  }
+}

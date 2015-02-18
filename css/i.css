@@ -1,0 +1,36 @@
+body {
+	font-size: 10px;
+}
+.distance-chart {
+	float:left;
+	margin:2rem;
+	/*position: absolute;*/
+	top:20px;
+	left:20px;
+}
+.distance-chart div.title {
+	border-bottom:1px solid #ddd;
+}
+.distance-chart h2 {
+	margin:0;
+	padding:0 0 0.2em;
+}
+.distance-chart h4 {
+	margin:0;
+	padding:0 0 0.2em;
+	color:#888;
+}
+.distance-chart circle {
+	fill-opacity:0.5;
+	fill:#666;
+}
+.distance-chart path {
+	fill:none;
+	stroke:#333;
+	stroke-width:1px;
+
+	/*shape-rendering:crispEdges;*/
+}
+.distance-chart path.avg {
+	stroke:#bbb;
+}

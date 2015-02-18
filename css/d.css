@@ -1,0 +1,190 @@
+body {
+	font-size: 12px;
+	font-family: Arial;
+}
+#chart {
+	padding:2rem;
+	width:960px;
+}
+#chart div#title {
+	margin:0;
+	border-bottom:1px solid #ddd;
+}
+#chart h2 {
+	margin:0;
+	padding:0 0 0.2em;
+}
+#chart h4 {
+	margin:0;
+	padding:0 0 0.2em;
+	color:#888;
+}
+.distance-chart {
+	float:left;
+	margin:0;
+	position: relative;
+}
+.distance-chart div.chart {
+	position: relative;
+}
+.distance-chart svg {
+	font-family: monospace;
+	color:#333;
+	font-size:11px;
+}
+.distance-chart circle {
+	fill-opacity:1;
+	fill:#666;
+}
+.distance-chart circle.bg {
+	fill-opacity:0;
+}
+
+.distance-chart .season.selected .point:hover circle {
+	fill:gold;
+	stroke:#333;
+	stroke-width:2px;
+}
+.distance-chart path {
+	fill:none;
+	stroke:#aaa;
+	stroke-width:1px;
+	/*shape-rendering:crispEdges;*/
+}
+.distance-chart path.bg {
+	stroke-opacity:0;
+	stroke-width:12px !important;
+}
+.distance-chart .season:hover path {
+	stroke:#888;
+	stroke-width:2px;
+	/*shape-rendering:crispEdges;*/
+}
+.distance-chart .season.selected path {
+	stroke:#333;
+	stroke-width:3px;
+	/*shape-rendering:crispEdges;*/
+}
+
+.distance-chart path.avg {
+	stroke:#ff0000;
+	stroke-width:1px;
+}
+.distance-chart .season:hover line.link,
+.distance-chart .season.selected line.link {
+	stroke:#333;
+	display: block
+}
+.distance-chart line.link {
+	fill:none;
+	stroke:#ddd;
+	stroke-width:1px;
+	display: none;
+}
+.distance-chart line.link.straight {
+	shape-rendering:crispEdges;
+}
+.distance-chart .season text {
+	fill:#666;
+}
+.distance-chart .season:hover text {
+	fill:#333;
+	font-weight: bold;
+}
+.distance-chart .season.selected text {
+	fill:#333;
+	font-weight: bold;
+}
+
+.distance-chart .season circle {
+	display: none;
+}
+.distance-chart .season .winner g.winner circle {
+	
+}
+.distance-chart .season .winner g.winner rect {
+	display: block;
+	fill-opacity:1;
+	fill:#666;
+	stroke:none;
+}
+.distance-chart .season.selected .winner g.winner rect {
+	fill:#333;
+}
+.distance-chart .season .winner g.winner line {
+	stroke:none;
+	stroke-width:1;
+	shape-rendering:crispEdges;
+}
+.distance-chart .season.selected .winner g.winner line {
+	stroke:#ddd;
+}
+.distance-chart .season.selected circle {
+	display: block;
+	fill:#333;
+	font-weight: bold;
+}
+.distance-chart .season.selected path.bg {
+	stroke-opacity:0.1;
+}
+
+.left .season text {
+	text-anchor:end;
+}
+
+.axis path,
+.axis line {
+	shape-rendering:crispEdges;
+}
+
+.axis .tick line {
+	stroke:#ddd;
+}
+
+
+#tooltip {
+	position: absolute;
+	overflow: visible;
+	height: 0px;
+	-webkit-transition: all 250ms linear;
+	-moz-transition: all 250ms linear;
+	-ms-transition: all 250ms linear;
+	-o-transition: all 250ms linear;
+	transition: all 250ms linear;
+}
+#tooltip.hidden {
+	display: none;
+}
+#tooltip>div{
+	position: absolute;
+	bottom:0;
+	background-color:rgba(0,0,0,0.8);
+	padding:10px;
+	left:-80px;
+}
+#tooltip h2 {
+	font-size:1.2em;
+	color:#fff;
+	margin:0;
+}
+#tooltip ol {
+	position:relative;
+	margin:0;
+	padding:0;
+	color:#fff;
+	overflow: hidden;
+	list-style-position:inside;
+}
+#tooltip li {
+	margin:0.4em 0;
+	width:140px;
+}
+#tooltip li span.team {
+	text-transform: capitalize;
+}
+#tooltip li span.points {
+	display: inline-block;
+	margin-left:3em;
+	float:right;
+}
+
